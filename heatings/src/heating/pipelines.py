@@ -1,4 +1,6 @@
 from scrapy.exceptions import DropItem
+import urlparse
+
 # -*- coding: utf-8 -*-
 
 # Define your item pipelines here
@@ -10,6 +12,15 @@ from scrapy.exceptions import DropItem
 class heatingPipeline(object):
     def process_item(self, item, spider):
         if item['linkwithprice']:
-              return item
+            parsed = urlparse.urlparse(item['linkwithprice'][0])
+            item['price'] = urlparse.parse_qs(parsed.query)['price']
+            item['categoryId'] = urlparse.parse_qs(parsed.query)['categoryId']  
+            item['productid'] = urlparse.parse_qs(parsed.query)['productid']    
+            item['sid'] = urlparse.parse_qs(parsed.query)['sid']
+            #item['title'] =  str.split("kaufen")[0]
+            str = item['title'][0]
+            #item['title'] =  str[:-str.index("kaufen")]
+            item['title'] =  str[:str.index("kaufen")]
+            return item
         else:
             raise DropItem("Leer")

@@ -50,7 +50,6 @@ class heatingSpider(scrapy.Spider):
         
     # third version from main page to subpages
     def parse(self, response):
-        i = 0
 #        for href in response.css("ul.directory.dir-col > li > a::attr('href')"):
         for href in response.css("td.va-middle >  a::attr('href')"):    
             url = response.urljoin(href.extract())
@@ -87,17 +86,18 @@ class heatingSpider(scrapy.Spider):
             #/html/body/div[2]/div[1]/div[1]/div/table/tbody/tr[2]/td[5]/a/img[2]
             item['title'] = sel.xpath('td[@class="cta"]/a/img[@class="btn-cta-shop"]/@alt').extract()
 
+            #if sel.xpath('td[@class="title"]/a[@class="offer-title link-2 webtrekk wt-prompt"]/@href').extract():
+           #    url= sel.xpath('td[@class="title"]/a[@class="offer-title link-2 webtrekk wt-prompt"]/@href').extract()    
+            #    url = response.urljoin(url)   
+             #   parsed = urlparse.urlparse(url)    
+              #  item['price'] = urlparse.parse_qs(parsed.query)['price']  
+               # item['categoryId'] = urlparse.parse_qs(parsed.query)['categoryId']  
+                #item['productid'] = urlparse.parse_qs(parsed.query)['productid']    
+                #item['sid'] = urlparse.parse_qs(parsed.query)['sid']
+
             #/html/body/div[2]/div[1]/div[1]/div/table/tbody/tr[4]/td[1]/a
             item['linkwithprice'] = sel.xpath('td[@class="title"]/a[@class="offer-title link-2 webtrekk wt-prompt"]/@href').extract()
-            if item['linkwithprice']:
-                i = i + 1
-                url= item['linkwithprice'][i]    
-                url = urlparse.urljoin("http://idealo.de", url)   
-                parsed = urlparse.urlparse(url)    
-                item['price'] = urlparse.parse_qs(parsed.query)['price']  
-                item['categoryId'] = urlparse.parse_qs(parsed.query)['categoryId']  
-                item['productid'] = urlparse.parse_qs(parsed.query)['productid']    
-                item['sid'] = urlparse.parse_qs(parsed.query)['sid']
+
                 
            #item['price'] = sel.xpath('a/span[@class="price"]/text()').extract()
             #time.sleep(self._time_to_wait())
