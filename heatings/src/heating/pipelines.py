@@ -9,10 +9,7 @@ from scrapy.exceptions import DropItem
 
 class heatingPipeline(object):
     def process_item(self, item, spider):
-        if item['price']:
-            return item
+        if item['linkwithprice']:
+              return item
         else:
-            if item['title']:
-                return item
-            else:
-                raise DropItem("Leer")
+            raise DropItem("Leer")

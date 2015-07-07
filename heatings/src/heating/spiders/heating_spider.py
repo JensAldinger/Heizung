@@ -1,6 +1,7 @@
 import scrapy
 import time
 import random
+import urlparse
 
 from heating.items import heatingItem
 
@@ -49,6 +50,7 @@ class heatingSpider(scrapy.Spider):
         
     # third version from main page to subpages
     def parse(self, response):
+        i = 0
 #        for href in response.css("ul.directory.dir-col > li > a::attr('href')"):
         for href in response.css("td.va-middle >  a::attr('href')"):    
             url = response.urljoin(href.extract())
@@ -61,10 +63,10 @@ class heatingSpider(scrapy.Spider):
    
     
     def parse_dir_contents(self, response):
-        for sel in response.xpath('//div'):
+        for sel in response.xpath('//tr'):
             item = heatingItem()
             #item['title'] = sel.xpath('td[@class="title"]/a[@class="offer-title link-2 webtrekk wt-prompt"]/text()').extract()
-            item['title'] = sel.xpath('h1[@class="heading-1"]/text()').extract()
+            #item['title'] = sel.xpath('h1[@class="heading-1"]/text()').extract()
             #===================================================================
             # # title seems to be in a child node sometimes, read this: http://stackoverflow.com/questions/18433376/xpath-select-certain-child-nodes
             # # use selenium and downloader middleware: http://stackoverflow.com/a/31140474/5061417
@@ -82,10 +84,22 @@ class heatingSpider(scrapy.Spider):
             # ## item['longtitle'] = u' ,'.join(sel.xpath('td[@class="title"]/a[@class="offer-title link-2 webtrekk wt-prompt"]/text()').extract())
             #===================================================================
 
-            
-            
-            #item['linkwithprice'] = sel.xpath('td[@class="title"]/a[@class="offer-title link-2 webtrekk wt-prompt"]/@href').extract()
-            item['price'] = sel.xpath('a/span[@class="price"]/text()').extract()
+            #/html/body/div[2]/div[1]/div[1]/div/table/tbody/tr[2]/td[5]/a/img[2]
+            item['title'] = sel.xpath('td[@class="cta"]/a/img[@class="btn-cta-shop"]/@alt').extract()
+
+            #/html/body/div[2]/div[1]/div[1]/div/table/tbody/tr[4]/td[1]/a
+            item['linkwithprice'] = sel.xpath('td[@class="title"]/a[@class="offer-title link-2 webtrekk wt-prompt"]/@href').extract()
+            if item['linkwithprice']:
+                i = i + 1
+                url= item['linkwithprice'][i]    
+                url = urlparse.urljoin("http://idealo.de", url)   
+                parsed = urlparse.urlparse(url)    
+                item['price'] = urlparse.parse_qs(parsed.query)['price']  
+                item['categoryId'] = urlparse.parse_qs(parsed.query)['categoryId']  
+                item['productid'] = urlparse.parse_qs(parsed.query)['productid']    
+                item['sid'] = urlparse.parse_qs(parsed.query)['sid']
+                
+           #item['price'] = sel.xpath('a/span[@class="price"]/text()').extract()
             #time.sleep(self._time_to_wait())
             # sleep time# http://stackoverflow.com/a/28105362/5061417 
             yield item
